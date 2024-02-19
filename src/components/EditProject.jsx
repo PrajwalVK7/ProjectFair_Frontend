@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Modal from 'react-bootstrap/Modal';
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import { BASE_URL } from '../services/baseurl';
 import { editUserProjectAPI } from '../services/allAPI';
+import { editProjectResponseContext } from '../context/ContextShare';
 
-function EditProject({project}) {
-      
+function EditProject({ project }) {
+
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [preview, setPreview] = useState("")
-
+const {editProjectResponse,seteditProjectResponse}= useContext(editProjectResponseContext)
   const [projectDetails, setProjectDetails] = useState({
-    id:project._id,
+    id: project._id,
     title: project.title,
     language: project.language,
     github: project.github,
@@ -28,25 +29,25 @@ function EditProject({project}) {
     }
   }, [projectDetails.projectImage])
 
-  const handleReset = ()=>{
+  const handleReset = () => {
     setProjectDetails({
-        title: project.title,
-        language: project.language,
-        github: project.github,
-        website: project.website,
-        overview: project.overview,
-        projectImage: ""
-      })
-      setPreview("")
+      title: project.title,
+      language: project.language,
+      github: project.github,
+      website: project.website,
+      overview: project.overview,
+      projectImage: ""
+    })
+    setPreview("")
   }
-  const handleUpdate = async(e)=>{
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    const {title,language,github,website,overview,projectImage,id} = projectDetails
-if(!id|| !title||!github||!language||!website||!overview||!projectImage){
-    alert("Please the form completely")
-}
-else{
-    try{
+    const { title, language, github, website, overview, projectImage, id } = projectDetails
+    if (!id || !title || !github || !language || !website || !overview ) {
+      alert("Please the form completely")
+    }
+    else {
+      try {
         const reqBody = new FormData();
         reqBody.append("title", title);
         reqBody.append("language", language);
@@ -55,38 +56,53 @@ else{
         reqBody.append("overview", overview);
         reqBody.append("projectImage", projectImage);
         const token = sessionStorage.getItem("token")
-        if(preview){
-            const reqHeader = {
-                "Content-Type": "multipart/form-data",
-                "Authorization": `Bearer ${token}`
-              };
-              const response =await editUserProjectAPI(id,reqBody,reqHeader);
-              console.log(response)
+        if (preview) {
+          const reqHeader = {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`
+          };
+          const response = await editUserProjectAPI(id, reqBody, reqHeader);
+          if(response.status===200){
+            handleClose()
+            alert("Project Updated Successfully");
+            seteditProjectResponse(response)
+          }else{
+            console.log(response.response.data)
+          }
+
 
         }
-        else{
-            const reqHeader = {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-              };
-              const response =await editUserProjectAPI(id,reqBody,reqHeader);
-              console.log(response)
+        else {
+          const reqHeader = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          };
+          const response = await editUserProjectAPI(id, reqBody, reqHeader);
+          if(response.status===200){
+            handleClose()
+            alert("Project Updated Successfully");
+            seteditProjectResponse(response)
+
+          }
+          else{
+            console.log(response.response.data)
+          }
 
         }
-        
 
-        }
-    catch(err){
+
+      }
+      catch (err) {
         console.log(err)
+      }
     }
-}
 
 
   }
-    return (
-        <>
-            <button onClick={handleShow} className='btn  ms-3'><i class="fa-solid fa-pen-to-square text-info"></i></button>
-            <Modal show={show} onHide={handleClose}>
+  return (
+    <>
+      <button onClick={handleShow} className='btn  ms-3'><i class="fa-solid fa-pen-to-square text-info"></i></button>
+      <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Add New Project</Modal.Title>
         </Modal.Header>
@@ -94,7 +110,7 @@ else{
           <div className='row'>
             <div className='col-lg-6 col-md-5'>
               <label htmlFor="img" className='btn' > Upload Image
-                <input  type="file" id='img' style={{ display: 'none' }}
+                <input type="file" id='img' style={{ display: 'none' }}
                   onChange={(e) => setProjectDetails({ ...projectDetails, projectImage: e.target.files[0] })} />
                 <img height={"200px"} width={"200"} src={preview ? preview : `${BASE_URL}/uploads/${project.projectImage}`} alt="Profile Image" />
               </label>
@@ -131,13 +147,13 @@ else{
           <Button variant="secondary" onClick={handleReset} >
             Reset
           </Button>
-          <Button variant="primary" onClick={(e)=>handleUpdate}>
+          <Button variant="primary" onClick={handleUpdate }>
             Save Changes
           </Button>
         </Modal.Footer>
       </Modal>
-        </>
-    )
+    </>
+  )
 }
 
 export default EditProject

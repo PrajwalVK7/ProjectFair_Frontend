@@ -5,8 +5,12 @@ import Dashboard from './pages/Dashboard';
 import Project from './pages/Project';
 import Home from './pages/Home';
 import Auth from './pages/Auth';
+import { useContext } from 'react';
+import { isAuthTokenContext } from './context/ContextShare';
 
 function App() {
+  const {isAuthToken,setIsAuthToken} = useContext(isAuthTokenContext)
+
   return (
     <>
 
@@ -15,7 +19,7 @@ function App() {
       <Route path='/login'  element={<Auth />} />
       <Route path='/register'  element={<Auth register={"register"} />} />
       <Route path='/project'  element={<Project/>} /> 
-      <Route path='/dashboard' element={<Dashboard/>} />
+      <Route path='/dashboard' element={isAuthToken? <Dashboard />:<Home/>} />
     </Routes>
     <Footer/>
     </>

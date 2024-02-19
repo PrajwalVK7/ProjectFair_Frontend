@@ -10,12 +10,11 @@ useEffect(()=>{
   const existingUserData = JSON.parse(sessionStorage.getItem("existingUser"))
   console.log(existingUserData)
   setUserName(existingUserData.username)
-  // console.log(userName)
-})
+},[])
 
   return (
     <>
-     <Header/>
+     <Header logout={"logout"}/>
      <h2 className='mt-5 ms-3'>Welcome <span style={{color:'orange'}}>{userName}</span></h2>
     <Row className='container-fluid mt-5'>
       <Col  md={8} >

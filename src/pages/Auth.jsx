@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import authImg from '../assets/WhatsApp_Image_2024-01-10_at_10.02.59_AM__2_-removebg-preview.png'
 import { Form } from 'react-bootstrap';
 import { loginAPI, registerAPI } from '../services/allAPI';
+import { isAuthTokenContext } from '../context/ContextShare';
 
 
 // Single page for login And Register
 
 function Auth({ register }) {
+  const {isAuthToken,setIsAuthToken} = useContext(isAuthTokenContext)
   const registerForm = register ? true : false;
   const navigate = useNavigate()
   // console.log(registerForm)
@@ -63,6 +65,8 @@ function Auth({ register }) {
       if (loginResult.status === 200) {
         sessionStorage.setItem("existingUser",JSON.stringify(loginResult.data.existingUser));
         sessionStorage.setItem("token",loginResult.data.token)
+        setIsAuthToken(true)
+
         navigate('/')
       }
       else {
